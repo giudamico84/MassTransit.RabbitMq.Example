@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using MassTransit.RabbitMq.Common;
+using MassTransit.RabbitMq.Consumer.Consumers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -7,9 +8,7 @@ using NLog;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using NLog.Targets;
-using System.CommandLine;
 using Microsoft.Extensions.Hosting;
-using MassTransit.RabbitMq.Publisher.Commands;
 
 // Configure NLog programmatically to log to console and file
 var nlogConfig = new LoggingConfiguration();
@@ -36,7 +35,7 @@ nlogConfig.AddRule(NLog.LogLevel.Info, NLog.LogLevel.Fatal, fileTarget);
 LogManager.Configuration = nlogConfig;
 
 // Setup configuration with fake RabbitMQ settings
-var inMemorySettings = new Dictionary<string, string>
+var inMemorySettings = new Dictionary<string, string?>
 {
     ["RabbitMQ:ConnectionString"] = "amqp://guest:guest@localhost:5672/TEST"
 };
@@ -45,8 +44,7 @@ var configuration = new ConfigurationBuilder()
     .AddInMemoryCollection(inMemorySettings)
     .Build();
 
-
-using var host = Host.CreateDefaultBuilder()
+var host = Host.CreateDefaultBuilder()
     .ConfigureServices((context, services) =>
     {
         services.AddLogging(builder =>
@@ -61,24 +59,29 @@ using var host = Host.CreateDefaultBuilder()
             });
         });
 
-        services.AddMassTransit(x => {
+        services.AddMassTransit(x =>
+        {
+            x.AddConsumer<SampleEventConsumer>();
+
             x.UsingRabbitMq((context, cfg) =>
-            {
+            {               
+
                 cfg.Host(new Uri(configuration.GetSection("RabbitMQ:ConnectionString").Value));
 
                 cfg.Message<SampleEvent>(t =>
                 {
-                    t.SetEntityName("_MassTransit.RabbitMq.Common.SampleEvent");
+                    t.SetEntityName("_MassTransit.RabbitMq.Common.SampleEvent");                    
                 });
+
+                cfg.ReceiveEndpoint("_MassTransit.RabbitMq.Common.SampleEvent.Queue", e =>
+                {                    
+                    e.Durable = true;
+                    e.AutoDelete = false;
+                    e.ConfigureConsumer<SampleEventConsumer>(context);                    
+                });                
             });
         });
 
-        services.AddTransient<PublishSampleEventCommand>();
-    }).Build();
+    }).Build();    
 
-var rootCommand = new RootCommand("MassTransit RabbitMQ Publisher")
-{
-    host.Services.GetRequiredService<PublishSampleEventCommand>()
-};
-
-return await rootCommand.Parse(args).InvokeAsync();
+await host.RunAsync();

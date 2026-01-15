@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="../MassTransit.RabbitMq.Common/MassTransit.RabbitMq.Common.csproj" Id="fdf7697d-2607-4247-9c2d-7ac39b32e13e" />
+  <Project Path="../MassTransit.RabbitMq.Consumer/MassTransit.RabbitMq.Consumer.csproj" Id="af37d1bc-8192-4710-86c0-30c12c2f8bb4" />
   <Project Path="MassTransit.RabbitMq.Publisher/MassTransit.RabbitMq.Publisher.csproj" />
 </Solution>
