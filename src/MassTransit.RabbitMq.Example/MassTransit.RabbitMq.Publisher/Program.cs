@@ -70,15 +70,22 @@ using var host = Host.CreateDefaultBuilder()
                 {
                     t.SetEntityName("_MassTransit.RabbitMq.Common.SampleEvent");
                 });
+
+                cfg.Message<SampleDelayEvent>(t =>
+                {
+                    t.SetEntityName("_MassTransit.RabbitMq.Common.SampleDelayEvent");
+                });
             });
         });
 
         services.AddTransient<PublishSampleEventCommand>();
+        services.AddTransient<PublishSampleDelayEventCommand>();
     }).Build();
 
 var rootCommand = new RootCommand("MassTransit RabbitMQ Publisher")
 {
-    host.Services.GetRequiredService<PublishSampleEventCommand>()
+    host.Services.GetRequiredService<PublishSampleEventCommand>(),
+    host.Services.GetRequiredService<PublishSampleDelayEventCommand>()
 };
 
 return await rootCommand.Parse(args).InvokeAsync();

@@ -62,6 +62,7 @@ var host = Host.CreateDefaultBuilder()
         services.AddMassTransit(x =>
         {
             x.AddConsumer<SampleEventConsumer>();
+            x.AddConsumer<SampleDelayEventConsumer>();
 
             x.UsingRabbitMq((context, cfg) =>
             {               
@@ -78,7 +79,21 @@ var host = Host.CreateDefaultBuilder()
                     e.Durable = true;
                     e.AutoDelete = false;
                     e.ConfigureConsumer<SampleEventConsumer>(context);                    
-                });                
+                });
+
+                cfg.Message<SampleDelayEvent>(t =>
+                {
+                    t.SetEntityName("_MassTransit.RabbitMq.Common.SampleDelayEvent");
+                });
+                                                
+                cfg.ReceiveEndpoint("_MassTransit.RabbitMq.Common.SampleDelayEvent.Queue", e =>
+                {
+                    e.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
+
+                    e.Durable = true;
+                    e.AutoDelete = false;
+                    e.ConfigureConsumer<SampleDelayEventConsumer>(context);
+                });
             });
         });
 
