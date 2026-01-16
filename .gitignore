@@ -12,3 +12,4 @@
 /src/.vs/MassTransit.RabbitMq.Example.slnx
 /src/MassTransit.RabbitMq.Publisher/bin/Debug/net8.0
 /src/MassTransit.RabbitMq.Publisher/obj
+/src/.vs
