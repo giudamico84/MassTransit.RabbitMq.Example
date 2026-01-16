@@ -9,3 +9,6 @@
 /src/MassTransit.RabbitMq.Common/bin/Debug/net8.0
 /src/MassTransit.RabbitMq.Consumer/obj
 /src/MassTransit.RabbitMq.Consumer/bin/Debug/net8.0
+/src/.vs/MassTransit.RabbitMq.Example.slnx
+/src/MassTransit.RabbitMq.Publisher/bin/Debug/net8.0
+/src/MassTransit.RabbitMq.Publisher/obj
