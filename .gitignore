@@ -1,0 +1,11 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/src/MassTransit.RabbitMq.Example/MassTransit.RabbitMq.Publisher/obj
+/src/MassTransit.RabbitMq.Example/.vs
+/src/MassTransit.RabbitMq.Example/MassTransit.RabbitMq.Publisher/bin/Debug/net8.0
+/src/MassTransit.RabbitMq.Common/obj
+/src/MassTransit.RabbitMq.Common/bin/Debug/net8.0
+/src/MassTransit.RabbitMq.Consumer/obj
+/src/MassTransit.RabbitMq.Consumer/bin/Debug/net8.0
