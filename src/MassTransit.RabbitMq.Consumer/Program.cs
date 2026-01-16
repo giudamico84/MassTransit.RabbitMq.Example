@@ -62,13 +62,22 @@ var host = Host.CreateDefaultBuilder()
         services.AddMassTransit(x =>
         {
             x.AddConsumer<SampleEventConsumer>();
-            x.AddConsumer<SampleDelayEventConsumer>();
+            x.AddConsumer<SampleDelayEventConsumer>(cfg =>
+            {
+                cfg.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));                
+            });
 
             x.UsingRabbitMq((context, cfg) =>
             {               
 
                 cfg.Host(new Uri(configuration.GetSection("RabbitMQ:ConnectionString").Value));
 
+                cfg.Message<Fault>(t =>
+                {
+                    t.SetEntityName("_MassTransit.RabbitMq.Example.Faults"); // nuovo nome exchange
+                });
+
+                // Configure SampleEvent
                 cfg.Message<SampleEvent>(t =>
                 {
                     t.SetEntityName("_MassTransit.RabbitMq.Common.SampleEvent");                    
@@ -81,19 +90,29 @@ var host = Host.CreateDefaultBuilder()
                     e.ConfigureConsumer<SampleEventConsumer>(context);                    
                 });
 
-                cfg.Message<SampleDelayEvent>(t =>
-                {
-                    t.SetEntityName("_MassTransit.RabbitMq.Common.SampleDelayEvent");
-                });
-                                                
+
+                // Configure SampleDelayEvent with error handling
                 cfg.ReceiveEndpoint("_MassTransit.RabbitMq.Common.SampleDelayEvent.Queue", e =>
                 {
-                    e.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
+                    cfg.Message<Fault<SampleDelayEvent>>(x =>
+                    {
+                        x.SetEntityName("_MassTransit.RabbitMq.Common.SampleDelayEvent.Error");
+                    });
 
-                    e.Durable = true;
-                    e.AutoDelete = false;
+                    e.ConfigureConsumeTopology = false;
+                    e.UseRawJsonDeserializer(RawSerializerOptions.All, isDefault: true);
                     e.ConfigureConsumer<SampleDelayEventConsumer>(context);
+
+                    e.Bind("_MassTransit.RabbitMq.Common.SampleDelayEvent.Queue", x =>
+                    {
+                        x.Durable = true;
+                        x.AutoDelete = false;
+                    });
                 });
+                
+
+                                
+                                               
             });
         });
 

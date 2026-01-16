@@ -73,7 +73,7 @@ using var host = Host.CreateDefaultBuilder()
 
                 cfg.Message<SampleDelayEvent>(t =>
                 {
-                    t.SetEntityName("_MassTransit.RabbitMq.Common.SampleDelayEvent");
+                    t.SetEntityName("_MassTransit.RabbitMq.Common.SampleDelayEvent.Queue");
                 });
             });
         });
