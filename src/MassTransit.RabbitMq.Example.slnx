@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="MassTransit.RabbitMq.Common/MassTransit.RabbitMq.Common.csproj" />
+  <Project Path="MassTransit.RabbitMq.Consumer/MassTransit.RabbitMq.Consumer.csproj" />
   <Project Path="MassTransit.RabbitMq.Publisher/MassTransit.RabbitMq.Publisher.csproj" />
 </Solution>
